@@ -1,0 +1,289 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Name:
+; Snake Game
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+x := 0
+y := 0
+
+Random, fffx, 3, 13
+Random, fffy, 2, 13
+
+fx := fffx * 50
+fy := fffy * 50
+
+NewButtonNum := 1
+move := 1
+nnn := 2
+bodyparts := 1
+food := 2
+
+
+
+Gui, Font, s15
+Gui, Color, c008000
+
+Gui, Show, +websiteMode w%A_ScreenWidth% h%A_ScreenHeight%
+Gui 2: Show, w700 h700
+
+Gui 2: Add, Button, x%x% y%y% w50 h50 vButton1, Head
+Gui 2: Add, Picture, x%fx% y%fy% h50 w50 vPicture1, https://i.ibb.co/X8DHY1p/food.png
+SetTimer, codeLoop, 300
+return
+codeLoop:
+
+
+gamelogic()
+
+
+if (move = 1)
+{
+Loop, 50
+{
+x++
+}
+if (x >= 700)
+{
+x := 0
+}
+GuiControl 2: Move, Button1, x%x% y%y%
+px := x
+py := y
+GuiControl 2: Text, Button1, Head
+}
+
+
+if (move = 2)
+{
+Loop, 50
+{
+x--
+}
+if (x <= -50)
+{
+x := 650
+}
+GuiControl 2: Move, Button1, x%x% y%y%
+px := x
+py := y
+GuiControl 2: Text, Button1, Head
+}
+
+
+if (move = 3)
+{
+Loop, 50
+{
+y--
+}
+if (y <= -50)
+{
+y := 650
+}
+GuiControl 2: Move, Button1, x%x% y%y%
+px := x
+py := y
+GuiControl 2: Text, Button1, Head
+}
+
+
+if (move = 4)
+{
+Loop, 50
+{
+y++
+}
+if (y >= 700)
+{
+y := 0
+}
+GuiControl 2: Move, Button1, x%x% y%y%
+px := x
+py := y
+GuiControl 2: Text, Button1, Head
+}
+
+
+collision()
+
+
+
+;;;;;;;;;;;;;;;;
+;;;; end of loop
+
+;;;;;;;;;;;;;;;;
+Return
+
+Right::
+if (move = 2) && (py = y)
+{
+return
+}
+move := 1
+Return
+
+
+Left::
+if (move = 1) && (py = y)
+{
+return
+}
+move := 2
+Return
+
+
+Up::
+if (move = 4) && (px = x)
+{
+return
+}
+move := 3
+Return
+
+Down::
+if (move = 3) && (px = x)
+{
+return
+}
+move := 4
+Return
+
+
+
+K::
+eat()
+
+
+DetectFoodOnTail()
+
+Return
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+gamelogic()
+{
+global
+
+if (bodyparts < food)
+{
+howmanybodyparts := food - 1
+howmanybodyparts := howmanybodyparts + 2
+NewButtonNum++
+NewButtonV := "Button" . NewButtonNum
+Gui 2: Add, Button, x750 y700 h50 w50 v%NewButtonV%
+;Gui, Show
+bodyparts++
+}
+
+
+xx := x
+yy := y
+
+objx%nnn% := x
+objy%nnn% := y
+sazdfxas := "Button" . nnn
+GuiControl 2: Move, %sazdfxas%, x%xx% y%yy%
+;Gui, Show
+nnn++
+if (nnn = howmanybodyparts)
+{
+nnn := 2
+}
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;; end of function
+
+}
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+collision()
+{
+global
+
+; if player hit itself
+
+kkk := 2
+Loop, 196
+{
+_1objx%kkk% := objx%kkk% - 50
+_2objx%kkk% := objx%kkk% + 50
+
+_1objy%kkk% := objy%kkk% - 50
+_2objy%kkk% := objy%kkk% + 50
+If (x > _1objx%kkk%) && (x < _2objx%kkk%) && (y > _1objy%kkk%) && (y < _2objy%kkk%)
+{
+MsgBox, ded
+}
+
+kkk++
+}
+
+
+
+kkk := -1
+Loop, 200
+{
+kkk++
+_1objx%kkk% := objx%kkk% - 50
+_2objx%kkk% := objx%kkk% + 50
+
+_1objy%kkk% := objy%kkk% - 50
+_2objy%kkk% := objy%kkk% + 50
+If (fx > _1objx%kkk%) && (fx < _2objx%kkk%) && (fy > _1objy%kkk%) && (fy < _2objy%kkk%) or (fx > _1x) && (fx < _2x) && (fy > _1y) && (fy < _2y)
+{
+;MsgBox, detected!
+DetectFoodOnTail()
+
+}
+}
+
+
+_1x := x - 50
+_2x := x + 50
+
+_1y := y - 50
+_2y := y + 50
+If (fx > _1x) && (fx < _2x) && (fy > _1y) && (fy < _2y)
+{
+eat()
+;MsgBox, eat
+}
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;; end of function
+
+}
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+eat()
+{
+global
+Random, fffx, 1, 13
+Random, fffy, 1, 13
+
+fx := fffx * 50
+fy := fffy * 50
+GuiControl 2: Move, Picture1, x%fx% y%fy%
+GuiControl 2: Picture, Picture1, https://i.ibb.co/X8DHY1p/food.png
+food++
+return food
+}
+
+DetectFoodOnTail()
+{
+global
+Random, fffx, 1, 13
+Random, fffy, 1, 13
+
+fx := fffx * 50
+fy := fffy * 50
+GuiControl 2: Move, Picture1, x%fx% y%fy%
+GuiControl 2: Picture, Picture1, https://i.ibb.co/X8DHY1p/food.png
+return
+}
